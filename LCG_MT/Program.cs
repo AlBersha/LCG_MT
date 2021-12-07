@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using LCG_MT.Casino;
+using MersenneTwister;
 
 namespace LCG_MT
 {
@@ -10,29 +8,50 @@ namespace LCG_MT
     {
         static void Main(string[] args)
         {
-            #region Lcg
-            
-            // var nums = new List<BigInteger>();
-            var nums = new List<int>();
-            var lcg = new Lcg();
-            
             var casino = new CasinoRoyale();
             var acc = casino.CreateAccount();
-            if (acc.money > 0)
+
+            #region Lcg
+            
+            // var nums = new List<int>();
+            // var lcg = new Lcg();
+            // var lcgMode = "Lcg";
+            //
+            // if (acc.money > 0)
+            // {
+            //     for (var i = 0; i < 3; i++)
+            //     {
+            //         nums.Add(casino.MakeBet(lcgMode, 1).realNumber);
+            //     }
+            // }
+            //
+            // lcg.GetOdds(nums);
+            // Console.Out.WriteLine($"A = {lcg.A}\nC = {lcg.C}\n");
+            // var predictedValue = lcg.PredictValue(nums.Last());
+            // Console.Out.WriteLine($"Predicted value = {predictedValue}");
+            //
+            // var output = casino.MakeBet(lcgMode, predictedValue);
+            // Console.Out.WriteLine(output.message);
+            #endregion
+
+            #region MT199937
+
+            const string MTmode = "Mt";
+            var seed = DateTimeOffset.Parse(acc.deletionTime).ToUnixTimeMilliseconds();
+
+            var MTrng = new MT199937((ulong)seed);
+            var predictedValue = MTrng.PredictValue(32);
+            
+            var bet = casino.MakeBet(MTmode, predictedValue).realNumber;
+
+            while (predictedValue != (ulong)bet)
             {
-                for (var i = 0; i < 3; i++)
-                {
-                    nums.Add((int)casino.MakeBet(1).realNumber);
-                }
+                seed++;
+                predictedValue = MTrng.PredictValue(4);
             }
-            
-            lcg.GetOdds(nums);
-            Console.Out.WriteLine($"A = {lcg.A}\nC = {lcg.C}\n");
-            var predictedValue = lcg.PredictValue(nums.Last());
-            Console.Out.WriteLine($"Predicted value = {predictedValue}");
-            
-            var output = casino.MakeBet(predictedValue);
-            Console.Out.WriteLine($"{output.message} - actual value = {output.realNumber}");
+            var mt = MTRandom.Create(MTEdition.Original_19937);
+            var r = mt.Next();
+
             #endregion
         }
     }

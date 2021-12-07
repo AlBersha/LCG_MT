@@ -1,4 +1,6 @@
-﻿namespace LCG_MT.Casino
+﻿using System;
+
+namespace LCG_MT.Casino
 {
     public class BetResponse
     {

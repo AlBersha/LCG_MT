@@ -11,7 +11,6 @@ namespace LCG_MT.Casino
         private static string Host => "http://95.217.177.249/casino/";
         private static string CreateAccUrl => "createacc?id=";
         private string BetUrl => "play{0}?id={1}&bet={2}&number={3}";
-        private string LcgMode => "Lcg";
         private static readonly Random _random = new();
         private int AccId = _random.Next(5000);
 
@@ -34,16 +33,24 @@ namespace LCG_MT.Casino
                 using var stream = new StreamReader(request.GetResponseStream()!);
                 return stream.ReadToEnd();
             }
-            catch (WebException e)
+            catch (WebException)
             {
                 return string.Empty;
             }
         }
 
-        public BetResponse MakeBet(BigInteger value)
+        public BetResponse MakeBet(string mode, BigInteger value)
         {
-            var response = HttpGet(string.Format(Host + BetUrl, LcgMode, AccId, 10.ToString(), value.ToString()));
-            return JsonSerializer.Deserialize<BetResponse>(response);
+            try
+            {
+                var response = HttpGet(string.Format(Host + BetUrl, mode, AccId, 10.ToString(), value.ToString()));
+                return JsonSerializer.Deserialize<BetResponse>(response);
+            }
+            catch (Exception)
+            {
+                Console.Out.WriteLine("Invalid response was received");
+                throw;
+            }
         }
     }
 }
