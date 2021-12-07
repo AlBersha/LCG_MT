@@ -6,6 +6,11 @@ namespace LCG_MT.Casino
     {
         public string message { get; set; }
         public CreateAccResponse account { get; set; }
-        public int realNumber { get; set; }
+        public long realNumber { get; set; }
+
+        public BetResponse()
+        {
+            message = string.Empty;
+        }
     }
 }

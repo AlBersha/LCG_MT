@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Numerics;
 using System.Text.Json;
 
 namespace LCG_MT.Casino
@@ -29,8 +28,7 @@ namespace LCG_MT.Casino
         {
             try
             {
-                var request = WebRequest.Create(requestUrl).GetResponse();
-                using var stream = new StreamReader(request.GetResponseStream()!);
+                using var stream = new StreamReader(WebRequest.Create(requestUrl).GetResponse().GetResponseStream()!);
                 return stream.ReadToEnd();
             }
             catch (WebException)
@@ -39,12 +37,12 @@ namespace LCG_MT.Casino
             }
         }
 
-        public BetResponse MakeBet(string mode, BigInteger value)
+        public BetResponse MakeBet(int betAmount, string mode, long value)
         {
             try
             {
-                var response = HttpGet(string.Format(Host + BetUrl, mode, AccId, 10.ToString(), value.ToString()));
-                return JsonSerializer.Deserialize<BetResponse>(response);
+                var response = HttpGet(string.Format(Host + BetUrl, mode, AccId, betAmount, value));
+                return response == string.Empty ? new BetResponse() : JsonSerializer.Deserialize<BetResponse>(response);
             }
             catch (Exception)
             {
@@ -52,5 +50,6 @@ namespace LCG_MT.Casino
                 throw;
             }
         }
+        
     }
 }
