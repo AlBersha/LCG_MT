@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Numerics;
 using System.Text.Json;
 
-namespace LCG_MT
+namespace LCG_MT.Casino
 {
-    public class Casino
+    public class CasinoRoyale
     {
         private static string Host => "http://95.217.177.249/casino/";
         private static string CreateAccUrl => "createacc?id=";
@@ -39,7 +40,7 @@ namespace LCG_MT
             }
         }
 
-        public BetResponse MakeBet(int value)
+        public BetResponse MakeBet(BigInteger value)
         {
             var response = HttpGet(string.Format(Host + BetUrl, LcgMode, AccId, 10.ToString(), value.ToString()));
             return JsonSerializer.Deserialize<BetResponse>(response);
